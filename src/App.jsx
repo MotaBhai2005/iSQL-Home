@@ -37,18 +37,34 @@ const enforceStrictTypes = (database) => {
   }
 };
 
+const saveDatabase = (database) => {
+  if (!database) return;
+  try {
+    const data = database.export();
+    let binary = '';
+    const chunkSize = 8192;
+    for (let c = 0; c < data.length; c += chunkSize) {
+      binary += String.fromCharCode.apply(null, data.subarray(c, c + chunkSize));
+    }
+    localStorage.setItem('isql_db_data', window.btoa(binary));
+  } catch (e) {
+    console.warn('Error saving DB to localStorage:', e);
+  }
+};
+
 function App() {
   const [db, setDb] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
 
   const [schema, setSchema] = useState([]);
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => localStorage.getItem('isql_theme') || 'light');
   const [mobilePanel, setMobilePanel] = useState('workspace');
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('isql_theme', theme);
   }, [theme]);
 
   useEffect(() => {
@@ -74,7 +90,23 @@ function App() {
         const SQL = await window.initSqlJs({
           locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
         });
-        const newDb = new SQL.Database();
+        
+        let newDb;
+        const savedB64 = localStorage.getItem('isql_db_data');
+        if (savedB64) {
+          try {
+            const binary = window.atob(savedB64);
+            const data = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+              data[i] = binary.charCodeAt(i);
+            }
+            newDb = new SQL.Database(data);
+          } catch(e) {
+            newDb = new SQL.Database();
+          }
+        } else {
+          newDb = new SQL.Database();
+        }
 
         newDb.create_function('INITCAP', (str) => {
           if (!str) return str;
@@ -244,6 +276,7 @@ function App() {
           block.msg = getSuccessMsg(origSQL);
           block.msgClass = 'ok';
           refreshSchema();
+          saveDatabase(db);
         }
 
         // Add to history
@@ -308,6 +341,7 @@ function App() {
 
     setSqlOutput([{ msg: 'Database reset. All tables dropped.', msgClass: 'info' }]);
     refreshSchema();
+    saveDatabase(db);
     setStatusMsg('Database reset — ' + new Date().toLocaleTimeString());
   };
 
@@ -315,6 +349,7 @@ function App() {
     if (!window.confirm("Creates person1234 and orders1234 tables with data. Are you sure?")) return;
     loadLabDB(db);
     refreshSchema();
+    saveDatabase(db);
     setSqlOutput([
       { msg: 'Constraints Lab DB loaded: person1234 (4 rows), orders1234 (4 rows).', msgClass: 'ok' },
       { msg: 'Try: SELECT * FROM person1234;', msgClass: 'info' }
@@ -327,6 +362,7 @@ function App() {
     if (!window.confirm("Creates employees, departments, managers tables with exact data. Are you sure?")) return;
     loadJoinsDB(db);
     refreshSchema();
+    saveDatabase(db);
     setSqlOutput([
       { msg: 'Joins Lab DB loaded: employees (5), departments (3), managers (2).', msgClass: 'ok' },
       { msg: 'Try: SELECT e.first_name, d.department_name FROM employees e INNER JOIN departments d ON e.department_id = d.department_id;', msgClass: 'info' }
