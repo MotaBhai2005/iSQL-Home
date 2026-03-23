@@ -7,6 +7,36 @@ import RightPanel from './components/RightPanel';
 import Split from 'react-split';
 import { translateOracle, splitStatements, rewriteFullOuterJoin, rewriteRightJoin, getSuccessMsg, loadLabDB, loadJoinsDB } from './db';
 
+const enforceStrictTypes = (database) => {
+  if (!database) return;
+  try {
+    const tables = database.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+    if (tables.length && tables[0].values.length) {
+      tables[0].values.forEach(([tableName]) => {
+        const cols = database.exec(`PRAGMA table_info("${tableName}")`);
+        if (cols.length && cols[0].values) {
+          let insertConds = [];
+          cols[0].values.forEach(col => {
+            const colName = col[1];
+            const colType = (col[2] || "").toUpperCase();
+            if (colType.includes('NUMBER') || colType.includes('DECIMAL') || colType.includes('INT') || colType.includes('NUMERIC')) {
+              insertConds.push(`typeof(NEW."${colName}") NOT IN ('integer', 'real', 'null')`);
+            } else if (colType.includes('DATE') || colType.includes('VARCHAR') || colType.includes('CHAR') || colType.includes('TEXT')) {
+              insertConds.push(`typeof(NEW."${colName}") NOT IN ('text', 'null')`);
+            }
+          });
+          if (insertConds.length > 0) {
+            database.run(`CREATE TRIGGER IF NOT EXISTS "trg_strict_ins_${tableName}" BEFORE INSERT ON "${tableName}" BEGIN SELECT RAISE(ABORT, 'ORA-01722: invalid number or strict datatype enforcement failed') WHERE ${insertConds.join(' OR ')}; END;`);
+            database.run(`CREATE TRIGGER IF NOT EXISTS "trg_strict_upd_${tableName}" BEFORE UPDATE ON "${tableName}" BEGIN SELECT RAISE(ABORT, 'ORA-01722: invalid number or strict datatype enforcement failed') WHERE ${insertConds.join(' OR ')}; END;`);
+          }
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Error enforcing strict types:', e);
+  }
+};
+
 function App() {
   const [db, setDb] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -138,6 +168,7 @@ function App() {
   const refreshSchema = () => {
     if (!db) return;
     try {
+      enforceStrictTypes(db);
       const res = db.exec("SELECT name, type FROM sqlite_master WHERE type IN ('table','view') ORDER BY type, name");
       if (!res.length || !res[0].values.length) {
         setSchema([]);
