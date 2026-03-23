@@ -16,7 +16,6 @@ The app features a multi-tab SQL workspace, a live schema browser, built-in lab 
 - **Strict Typing (`ORA-01722`)**: Relies on dynamic generation of `BEFORE INSERT` and `BEFORE UPDATE` database triggers to force strict data typing, halting bad inputs gracefully like a real Oracle server.
 - **Zero-Freeze Background Execution**: The entire database engine computes queries on an asynchronous **Web Worker**, ensuring the frontend UI never locks up during massive analytical `CROSS JOIN` calculations.
 - **Limitless Offline Persistence**: Replaces normal 5MB LocalStorage with **IndexedDB** (`localforage`), permanently saving massive binary database arrays natively in your browser.
-- **Multi-Tab Workspace**: Write and execute multiple queries simultaneously.
 - **Fully Responsive**: Drag-to-resize split panels on Desktop, and a dedicated tabbed navigation layout for Mobile.
 
 ---
