@@ -17,7 +17,18 @@ function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('isql_theme') || 'light');
   const [mobilePanel, setMobilePanel] = useState('workspace');
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
-  const [queryHistory, setQueryHistory] = useState([]);
+  const [queryHistory, setQueryHistory] = useState(() => {
+    try {
+      const stored = localStorage.getItem('isql_history');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('isql_history', JSON.stringify(queryHistory));
+  }, [queryHistory]);
   const [tabs, setTabs] = useState([{ id: 1, label: 'Worksheet 1', sql: '' }]);
   const [activeTabId, setActiveTabId] = useState(1);
   const [tabCtr, setTabCtr] = useState(2);
@@ -128,7 +139,9 @@ function App() {
     const { success, data } = await callWorker('RESET_DB');
     if (success) {
       setSchema(data.schema || []);
-      setSqlOutput([{ msg: 'Database reset. All tables dropped.', msgClass: 'info' }]);
+      setQueryHistory([]);
+      localStorage.removeItem('isql_history');
+      setSqlOutput([{ msg: 'Database and History reset cleanly.', msgClass: 'info' }]);
       setStatusMsg('Database reset — ' + new Date().toLocaleTimeString());
     }
   }, []);

@@ -4,7 +4,7 @@ export default function Header({ onExportSQL, onResetDB, theme, toggleTheme }) {
     return (
         <header>
             <div className="h-left">
-                <div className="logo-oracle">Oracle</div>
+                <div className="logo-oracle">Aura SQL</div>
                 <div className="logo-divider"></div>
                 <div className="app-title"><em>i</em>SQL*Home &nbsp;— College Practice Edition</div>
             </div>
