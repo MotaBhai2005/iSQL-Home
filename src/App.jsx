@@ -6,6 +6,7 @@ import Workspace from './components/Workspace';
 import RightPanel from './components/RightPanel';
 import Split from 'react-split';
 import { translateOracle, splitStatements, rewriteFullOuterJoin, rewriteRightJoin, getSuccessMsg, loadLabDB, loadJoinsDB } from './db';
+import localforage from 'localforage';
 
 const enforceStrictTypes = (database) => {
   if (!database) return;
@@ -37,18 +38,13 @@ const enforceStrictTypes = (database) => {
   }
 };
 
-const saveDatabase = (database) => {
+const saveDatabase = async (database) => {
   if (!database) return;
   try {
     const data = database.export();
-    let binary = '';
-    const chunkSize = 8192;
-    for (let c = 0; c < data.length; c += chunkSize) {
-      binary += String.fromCharCode.apply(null, data.subarray(c, c + chunkSize));
-    }
-    localStorage.setItem('isql_db_data', window.btoa(binary));
+    await localforage.setItem('isql_db_data', data);
   } catch (e) {
-    console.warn('Error saving DB to localStorage:', e);
+    console.warn('Error saving DB to IndexedDB:', e);
   }
 };
 
@@ -92,19 +88,26 @@ function App() {
         });
         
         let newDb;
-        const savedB64 = localStorage.getItem('isql_db_data');
-        if (savedB64) {
-          try {
-            const binary = window.atob(savedB64);
-            const data = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) {
-              data[i] = binary.charCodeAt(i);
+        try {
+          const savedData = await localforage.getItem('isql_db_data');
+          if (savedData instanceof Uint8Array || (savedData && savedData.length > 0)) {
+            newDb = new SQL.Database(savedData);
+          } else {
+            const savedB64 = localStorage.getItem('isql_db_data');
+            if (savedB64) {
+              const binary = window.atob(savedB64);
+              const data = new Uint8Array(binary.length);
+              for (let i = 0; i < binary.length; i++) {
+                data[i] = binary.charCodeAt(i);
+              }
+              newDb = new SQL.Database(data);
+              localforage.setItem('isql_db_data', data);
+              localStorage.removeItem('isql_db_data');
+            } else {
+              newDb = new SQL.Database();
             }
-            newDb = new SQL.Database(data);
-          } catch(e) {
-            newDb = new SQL.Database();
           }
-        } else {
+        } catch(e) {
           newDb = new SQL.Database();
         }
 
