@@ -6,6 +6,91 @@ import 'prismjs/components/prism-sql';
 
 const Editor = EditorPkg.default || EditorPkg;
 
+const ResultTable = ({ out, onExportCSV }) => {
+    const [page, setPage] = React.useState(0);
+    const PAGE_SIZE = 50;
+
+    const totalPages = Math.ceil(out.values.length / PAGE_SIZE);
+    const startIdx = page * PAGE_SIZE;
+    const currentRows = out.values.slice(startIdx, startIdx + PAGE_SIZE);
+
+    return (
+        <div className="res-tbl-wrap">
+            <table className="res-tbl">
+                <thead>
+                    <tr>
+                        {out.columns.map((c, i) => <th key={i}>{c.toUpperCase()}</th>)}
+                    </tr>
+                </thead>
+                <tbody>
+                    {currentRows.map((row, i) => (
+                        <tr key={i}>
+                            {row.map((cell, j) => (
+                                <td key={j} className={cell === null ? 'null-val' : ''}>
+                                    {cell === null ? '(null)' : String(cell)}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', padding: '0 4px 6px 4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {out.rowCount !== undefined && (
+                        <div className="res-rowcount" style={{ marginTop: 0 }}>
+                            {out.rowCount} row(s)
+                            {totalPages > 1 ? ` (showing ${startIdx + 1} - ${Math.min(startIdx + PAGE_SIZE, out.values.length)})` : ''}
+                        </div>
+                    )}
+                    {totalPages > 1 && (
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                            <button 
+                                className="clear-btn" 
+                                style={{ padding: '2px 6px', fontSize: '11px', opacity: page === 0 ? 0.5 : 1 }} 
+                                disabled={page === 0} 
+                                onClick={() => setPage(p => p - 1)}
+                            >
+                                ◀ Prev
+                            </button>
+                            <span style={{ fontSize: '11px', alignSelf: 'center', color: 'var(--text-muted)' }}>
+                                Page {page + 1} of {totalPages}
+                            </span>
+                            <button 
+                                className="clear-btn" 
+                                style={{ padding: '2px 6px', fontSize: '11px', opacity: page === totalPages - 1 ? 0.5 : 1 }} 
+                                disabled={page === totalPages - 1} 
+                                onClick={() => setPage(p => p + 1)}
+                            >
+                                Next ▶
+                            </button>
+                        </div>
+                    )}
+                </div>
+                <button 
+                    onClick={() => onExportCSV(out.columns, out.values)}
+                    style={{ 
+                        background: 'var(--success)', 
+                        color: 'white', 
+                        border: 'none', 
+                        padding: '4px 10px', 
+                        fontSize: '11px',
+                        borderRadius: '3px',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--mono)',
+                        fontWeight: 'bold',
+                        transition: 'opacity 0.2s',
+                        opacity: 0.9
+                    }}
+                    onMouseEnter={(e) => e.target.style.opacity = 1}
+                    onMouseLeave={(e) => e.target.style.opacity = 0.9}
+                >
+                    📥 Download CSV
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const Workspace = React.forwardRef(({
     tabs, activeTabId, onAddTab, onCloseTab, onSwitchTab,
     onRunSQL, onClearEditor, sqlOutput, updateTabSql, ...props
@@ -29,6 +114,27 @@ const Workspace = React.forwardRef(({
         const newSql = val.slice(0, pos) + snippet + val.slice(ed.selectionEnd);
         updateTabSql(activeTab.id, newSql);
         setTimeout(() => { ed.focus(); ed.selectionStart = ed.selectionEnd = pos + snippet.length; }, 0);
+    };
+//handle export csv
+    const handleExportCSV = (columns, values) => {
+        if (!columns || !values) return;
+        const escapeCSV = (str) => {
+            if (str === null || str === undefined) return '';
+            const s = String(str);
+            if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+                return `"${s.replace(/"/g, '""')}"`;
+            }
+            return s;
+        };
+        const header = columns.map(escapeCSV).join(',');
+        const rows = values.map(row => row.map(escapeCSV).join(',')).join('\n');
+        const blob = new Blob([header + '\n' + rows], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `query_results_${Date.now()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
     };
 
     return (
@@ -70,12 +176,7 @@ const Workspace = React.forwardRef(({
                 <div className="ep-footer">
                     <div className="ep-left">
                         <button className="exec-btn" onClick={() => onRunSQL(activeTab.sql)}>Execute</button>
-                        <span className="out-label">Output:</span>
-                        <select className="out-select" defaultValue="Work Screen ✓">
-                            <option>Work Screen ✓</option>
-                            <option>Script Output</option>
-                        </select>
-                        <span className="char-c">{(activeTab?.sql || '').length} chars</span>
+                        <span className="char-c" style={{ marginLeft: '6px' }}>{(activeTab?.sql || '').length} chars</span>
                     </div>
                     <div className="ep-right">
                         <span className="shortcut-hint"><span className="kbd">Ctrl</span>+<span className="kbd">Enter</span> to run</span>
@@ -108,29 +209,7 @@ const Workspace = React.forwardRef(({
                             {out.sqlLine && <div className="res-sql-line">{out.sqlLine};</div>}
                             {out.msg && <div className={`res-msg ${out.msgClass}`}>{out.msg}</div>}
                             {out.columns && out.values && (
-                                <div className="res-tbl-wrap">
-                                    <table className="res-tbl">
-                                        <thead>
-                                            <tr>
-                                                {out.columns.map((c, i) => <th key={i}>{c.toUpperCase()}</th>)}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {out.values.map((row, i) => (
-                                                <tr key={i}>
-                                                    {row.map((cell, j) => (
-                                                        <td key={j} className={cell === null ? 'null-val' : ''}>
-                                                            {cell === null ? '(null)' : String(cell)}
-                                                        </td>
-                                                    ))}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                    {out.rowCount !== undefined && (
-                                        <div className="res-rowcount">{out.rowCount} row(s) selected.</div>
-                                    )}
-                                </div>
+                                <ResultTable out={out} onExportCSV={handleExportCSV} />
                             )}
                         </div>
                     ))
