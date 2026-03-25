@@ -195,17 +195,19 @@ function App() {
   const handleSelectSql = (sqlStr) => handleUpdateTabSql(activeTabId, sqlStr);
   const handleTableClick = (tableName) => handleUpdateTabSql(activeTabId, `SELECT * FROM ${tableName};`);
 
+  //loading screen
   if (loading) {
     return (
       <div className="loading-screen">
-        <div className="ld-logo">ORACLE</div>
-        <div className="ld-sub"><em>i</em>SQL*Home — College Edition</div>
+        <div className="ld-logo">QPracto</div>
+        <div className="ld-sub"><em>i</em>SQL*Home &nbsp;— College Practice Edition</div>
         <div className="spinner"></div>
         <div className="ld-txt">Initializing SQLite engine…</div>
       </div>
     );
   }
 
+  //error screen
   if (errorMsg) {
     return (
       <div style={{ color: 'red', padding: '24px', textAlign: 'center' }}>
@@ -221,7 +223,7 @@ function App() {
         onExportSQL={handleExportSQL}
         onResetDB={handleResetDB}
         theme={theme}
-        toggleTheme={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
+        toggleTheme={() => setTheme(t => t === 'light' ? 'dark' : (t === 'dark' ? 'dimmed' : 'light'))}
       />
 
       {isMobile ? (
