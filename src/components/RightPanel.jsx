@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
 import { LAB_DATA, SYNTAX_SECTIONS } from '../dbData';
 
-export default function RightPanel({ queryHistory, schema, onSelectSql }) {
+
+const RightPanel = React.forwardRef(({ queryHistory, schema, onSelectSql, ...props }, ref) => {
     const [activeTab, setActiveTab] = useState('lab');
     const [labCategory, setLabCategory] = useState('sql1');
     const [openLabQ, setOpenLabQ] = useState(null);
+    // To track which questions have answers revealed
+    const [revealedAnswers, setRevealedAnswers] = useState({});
+
+    React.useEffect(() => {
+        setRevealedAnswers({});
+    }, [openLabQ]);
+
+    const handleCategoryChange = (e) => {
+        setLabCategory(e.target.value);
+        setRevealedAnswers({});
+        setOpenLabQ(null);
+    };
 
     const renderLab = () => {
         const data = LAB_DATA[labCategory];
@@ -12,7 +25,7 @@ export default function RightPanel({ queryHistory, schema, onSelectSql }) {
         return (
             <div className="lab-panel vis">
                 <div className="lab-selector">
-                    <select value={labCategory} onChange={e => setLabCategory(e.target.value)}>
+                    <select value={labCategory} onChange={handleCategoryChange}>
                         <option value="sql1">SQL-1: Basics (DDL/DML)</option>
                         <option value="sql2">SQL-2: SELECT, Operators, Aliases</option>
                         <option value="sql3">SQL-3: Functions &amp; GROUP BY</option>
@@ -37,10 +50,21 @@ export default function RightPanel({ queryHistory, schema, onSelectSql }) {
                                 </div>
                                 <div className="lab-q-body">
                                     <div className="lab-q-text">{item.q}</div>
-                                    <div className="lab-ans" title="Click to load into editor" onClick={() => onSelectSql(item.a)}>
-                                        {item.a}
-                                    </div>
-                                    <div className="lab-ans-hint">↑ Click answer to load into editor, then Execute</div>
+                                    {revealedAnswers[i] ? (
+                                        <>
+                                            <div className="lab-ans" title="Click to load into editor" onClick={() => onSelectSql(item.a)}>
+                                                {item.a}
+                                            </div>
+                                            <div className="lab-ans-hint">↑ Click answer to load into editor, then Execute</div>
+                                        </>
+                                    ) : (
+                                        <button 
+                                            className="show-ans-btn"
+                                            onClick={() => setRevealedAnswers(prev => ({ ...prev, [i]: true }))}
+                                        >
+                                            👁 Show Answer
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         );
@@ -111,7 +135,7 @@ export default function RightPanel({ queryHistory, schema, onSelectSql }) {
     };
 
     return (
-        <div className="right-panel">
+        <div className={`right-panel ${props.className || ''}`} style={props.style} ref={ref}>
             <div className="rp-tabs">
                 <div className={`rp-tab ${activeTab === 'lab' ? 'active' : ''}`} onClick={() => setActiveTab('lab')}>Lab Q&amp;A</div>
                 <div className={`rp-tab ${activeTab === 'syntax' ? 'active' : ''}`} onClick={() => setActiveTab('syntax')}>Syntax</div>
@@ -126,4 +150,6 @@ export default function RightPanel({ queryHistory, schema, onSelectSql }) {
             </div>
         </div>
     );
-}
+});
+
+export default RightPanel;

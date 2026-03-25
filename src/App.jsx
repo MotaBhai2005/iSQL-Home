@@ -29,9 +29,38 @@ function App() {
   useEffect(() => {
     localStorage.setItem('isql_history', JSON.stringify(queryHistory));
   }, [queryHistory]);
-  const [tabs, setTabs] = useState([{ id: 1, label: 'Worksheet 1', sql: '' }]);
-  const [activeTabId, setActiveTabId] = useState(1);
-  const [tabCtr, setTabCtr] = useState(2);
+
+  const [tabs, setTabs] = useState(() => {
+    try {
+      const stored = localStorage.getItem('isql_tabs');
+      return stored ? JSON.parse(stored) : [{ id: 1, label: 'Worksheet 1', sql: '' }];
+    } catch {
+      return [{ id: 1, label: 'Worksheet 1', sql: '' }];
+    }
+  });
+
+  const [activeTabId, setActiveTabId] = useState(() => {
+    const stored = localStorage.getItem('isql_active_tab');
+    return stored ? parseInt(stored, 10) : 1;
+  });
+
+  const [tabCtr, setTabCtr] = useState(() => {
+    const stored = localStorage.getItem('isql_tab_ctr');
+    return stored ? parseInt(stored, 10) : 2;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('isql_tabs', JSON.stringify(tabs));
+  }, [tabs]);
+
+  useEffect(() => {
+    localStorage.setItem('isql_active_tab', activeTabId.toString());
+  }, [activeTabId]);
+
+  useEffect(() => {
+    localStorage.setItem('isql_tab_ctr', tabCtr.toString());
+  }, [tabCtr]);
+
   const [sqlOutput, setSqlOutput] = useState([]);
   const [statusMsg, setStatusMsg] = useState('Ready — Connected to in-memory SQLite database');
 
@@ -218,7 +247,7 @@ function App() {
   }
 
   return (
-    <div className="app-main-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+    <div className="app-main-layout" style={{ display: 'flex', flexDirection: 'column', height: '100dvh', width: '100vw', maxWidth: '100%', overflow: 'hidden' }}>
       <Header
         onExportSQL={handleExportSQL}
         onResetDB={handleResetDB}

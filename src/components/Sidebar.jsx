@@ -1,7 +1,7 @@
 /* eslint-disable no-empty */
 import React, { useState } from 'react';
 
-export default function Sidebar({ schema, onLoadLab, onLoadJoins, onReset, onTableClick }) {
+const Sidebar = React.forwardRef(({ schema, onLoadLab, onLoadJoins, onReset, onTableClick, ...props }, ref) => {
   const [openTables, setOpenTables] = useState({});
 
   const toggleTable = (name) => {
@@ -10,7 +10,7 @@ export default function Sidebar({ schema, onLoadLab, onLoadJoins, onReset, onTab
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${props.className || ''}`} style={props.style} ref={ref}>
       <div className="sidebar-header">📋 Schema Browser</div>
       <div className="section-label">Tables / Views</div>
 
@@ -53,4 +53,6 @@ export default function Sidebar({ schema, onLoadLab, onLoadJoins, onReset, onTab
       </div>
     </div>
   );
-}
+});
+
+export default Sidebar;

@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
 import { SNIPPETS } from '../db';
 
-export default function Workspace({
+const Workspace = React.forwardRef(({
     tabs, activeTabId, onAddTab, onCloseTab, onSwitchTab,
-    onRunSQL, onClearEditor, sqlOutput, updateTabSql
-}) {
+    onRunSQL, onClearEditor, sqlOutput, updateTabSql, ...props
+}, ref) => {
     const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0];
     const editorRef = useRef(null);
 
@@ -35,7 +35,7 @@ export default function Workspace({
     };
 
     return (
-        <div className="workspace">
+        <div className={`workspace ${props.className || ''}`} style={props.style} ref={ref}>
             {/* Tabs */}
             <div className="tab-bar">
                 {tabs.map(t => (
@@ -134,4 +134,6 @@ export default function Workspace({
             {/* Status bar (moved to App.jsx for global state, or kept here as a prop) */}
         </div>
     );
-}
+});
+
+export default Workspace;
