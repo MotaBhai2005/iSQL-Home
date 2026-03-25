@@ -14,6 +14,12 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const [schema, setSchema] = useState([]);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
   const [theme, setTheme] = useState(() => localStorage.getItem('isql_theme') || 'light');
   const [mobilePanel, setMobilePanel] = useState('workspace');
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -62,7 +68,7 @@ function App() {
   }, [tabCtr]);
 
   const [sqlOutput, setSqlOutput] = useState([]);
-  const [statusMsg, setStatusMsg] = useState('Ready — Connected to in-memory SQLite database');
+  const [statusMsg, setStatusMsg] = useState('Initializing...');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -283,7 +289,6 @@ function App() {
             {mobilePanel === 'lab' && (
               <RightPanel
                 queryHistory={queryHistory}
-                schema={schema}
                 onSelectSql={(sql) => { handleSelectSql(sql); setMobilePanel('workspace'); }}
               />
             )}
@@ -326,14 +331,19 @@ function App() {
 
             <RightPanel
               queryHistory={queryHistory}
-              schema={schema}
               onSelectSql={handleSelectSql}
             />
           </Split>
 
+          {/* STATUS BAR */}
           <div className="status-bar">
-            <span>{statusMsg}</span>
-            <span>SQLite In-Browser | Oracle Syntax Compatible</span>
+            <div className="status-left">
+              {loading ? '⏳ Loading SQLite engine...' : errorMsg ? <span className="error">{errorMsg}</span> : statusMsg}
+            </div>
+            <div className="status-right">
+              <span style={{ marginRight: '15px', fontFamily: 'var(--mono)' }}>{now.toLocaleTimeString()}</span>
+              Storage: Memory
+            </div>
           </div>
         </>
       )}

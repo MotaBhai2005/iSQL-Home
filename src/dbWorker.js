@@ -66,11 +66,14 @@ const getRefreshSchema = () => {
       let rowCount = 0;
       try { rowCount = db.exec(`SELECT COUNT(*) FROM "${name}"`)[0].values[0][0]; } catch (e) {}
       let columns = [];
+      let fks = [];
       try {
         const cols = db.exec(`PRAGMA table_info("${name}")`);
         if (cols.length) columns = cols[0].values;
+        const fkData = db.exec(`PRAGMA foreign_key_list("${name}")`);
+        if (fkData.length) fks = fkData[0].values;
       } catch (e) {}
-      return { name, type, rowCount, columns };
+      return { name, type, rowCount, columns, fks };
     });
   } catch (e) {
     console.error('Worker: Error refreshing schema', e);

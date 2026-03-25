@@ -1,4 +1,3 @@
-/* eslint-disable no-empty */
 import React, { useState } from 'react';
 
 const Sidebar = React.forwardRef(({ schema, onLoadLab, onLoadJoins, onReset, onTableClick, ...props }, ref) => {
@@ -6,7 +5,6 @@ const Sidebar = React.forwardRef(({ schema, onLoadLab, onLoadJoins, onReset, onT
 
   const toggleTable = (name) => {
     setOpenTables(prev => ({ ...prev, [name]: !prev[name] }));
-    onTableClick(name);
   };
 
   return (
@@ -22,21 +20,30 @@ const Sidebar = React.forwardRef(({ schema, onLoadLab, onLoadJoins, onReset, onT
             <div key={tbl.name} className={`tbl-entry ${openTables[tbl.name] ? 'open' : ''}`}>
               <div className="tbl-name" onClick={() => toggleTable(tbl.name)}>
                 <span className="ico">{tbl.type === 'view' ? '👁' : '▦'}</span>
-                {tbl.name}
-                <span className="badge">{tbl.rowCount} rows</span>
+                <span>{tbl.name}</span>
+                <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <button 
+                      title={`Run SELECT * FROM ${tbl.name}`}
+                      style={{ background: 'var(--oracle-blue2)', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', fontSize: '9px', padding: '2px 5px', fontWeight: 'bold' }} 
+                      onClick={(e) => { e.stopPropagation(); onTableClick(tbl.name); }}
+                    >
+                      QUERY
+                    </button>
+                    <span className="badge" style={{ marginLeft: 0 }}>{tbl.rowCount} rows</span>
+                </span>
               </div>
               <div className="col-rows">
                 {tbl.columns.map(col => {
                   const isPK = col[5] === 1;
-                  const notNull = col[3] === 1;
+                  const nn = col[3] === 1;
+                  const fk = tbl.fks ? tbl.fks.find(f => f[3] === col[1]) : null;
                   return (
-                    <div key={col[1]} className="col-row">
-                      {isPK && <span className="col-pk">PK</span>}
+                    <div key={col[1]} className="sch-col">
+                      {isPK && <span className="sch-pk" title="Primary Key">PK</span>}
+                      {fk && <span className="sch-fk" title={`Foreign Key referencing ${fk[2]}.${fk[4]}`}>FK</span>}
                       <b>{col[1]}</b>
-                      <span className="col-type">
-                        {col[2] || ''}
-                        {notNull && !isPK ? ' NN' : ''}
-                      </span>
+                      <span className="sch-ct">{col[2] || ''}</span>
+                      {nn && !isPK && <span className="sch-nn" title="Not Null">NN</span>}
                     </div>
                   );
                 })}

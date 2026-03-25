@@ -227,6 +227,50 @@ header {
   overflow: hidden;
 }
 
+.sch-col {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 18px;
+  font-size: 11px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.sch-pk {
+  background: var(--oracle-red);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 8px;
+  font-weight: bold;
+}
+
+.sch-fk {
+  background: var(--oracle-blue2);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 8px;
+  font-weight: bold;
+}
+
+.sch-nn {
+  background: var(--border);
+  color: var(--text-muted);
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 8px;
+  font-weight: bold;
+  margin-left: auto;
+}
+
+.sch-ct {
+  color: var(--oracle-blue2);
+  font-style: italic;
+  font-size: 10px;
+}
+
 .sidebar-header {
   background: var(--oracle-blue);
   color: white;
@@ -1012,58 +1056,7 @@ header {
   opacity: 0.85;
 }
 
-/* Schema panel */
-.schema-panel {
-  display: none;
-  overflow-y: auto;
-  padding: 10px;
-  font-family: var(--mono);
-  font-size: 11px;
-}
-
-.schema-panel.vis {
-  display: block;
-}
-
-.sch-tbl-name {
-  font-weight: bold;
-  color: var(--oracle-blue);
-  margin: 10px 0 4px;
-  font-size: 12px;
-}
-
-.sch-tbl-name:first-child {
-  margin-top: 0;
-}
-
-.sch-col {
-  padding: 1px 0 1px 10px;
-  color: var(--text);
-  display: flex;
-  gap: 5px;
-  align-items: center;
-}
-
-.sch-ct {
-  color: #aaa;
-}
-
-.sch-pk {
-  color: var(--oracle-red);
-  font-size: 9px;
-  font-weight: bold;
-}
-
-.sch-fk {
-  color: var(--oracle-blue2);
-  font-size: 9px;
-  font-weight: bold;
-}
-
-.sch-nn {
-  color: #E67E22;
-  font-size: 9px;
-}
+/* Legacy Schema panel removed */
 
 /* Syntax Help Panel */
 .syntax-panel {
