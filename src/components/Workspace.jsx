@@ -1,38 +1,28 @@
 import React, { useRef } from 'react';
 import { SNIPPETS } from '../db';
+import EditorPkg from 'react-simple-code-editor';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-sql';
+
+const Editor = EditorPkg.default || EditorPkg;
 
 const Workspace = React.forwardRef(({
     tabs, activeTabId, onAddTab, onCloseTab, onSwitchTab,
     onRunSQL, onClearEditor, sqlOutput, updateTabSql, ...props
 }, ref) => {
     const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0];
-    const editorRef = useRef(null);
-
-    React.useEffect(() => {
-        if (editorRef.current) {
-            editorRef.current.style.height = 'auto';
-            editorRef.current.style.height = editorRef.current.scrollHeight + 'px';
-        }
-    }, [activeTab?.sql]);
+    
+    const getEditorTextarea = () => document.querySelector('.sql-editor textarea');
 
     const handleKeyDown = (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             e.preventDefault();
             onRunSQL(activeTab.sql);
         }
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const ed = e.target;
-            const s = ed.selectionStart;
-            const val = ed.value;
-            const newSql = val.slice(0, s) + '    ' + val.slice(ed.selectionEnd);
-            updateTabSql(activeTab.id, newSql);
-            setTimeout(() => { ed.selectionStart = ed.selectionEnd = s + 4; }, 0);
-        }
     };
 
     const handleSnippet = (snippet) => {
-        const ed = editorRef.current;
+        const ed = getEditorTextarea();
         if (!ed) return;
         const pos = ed.selectionStart;
         const val = ed.value;
@@ -59,14 +49,23 @@ const Workspace = React.forwardRef(({
             {/* Editor Panel */}
             <div className="editor-panel">
                 <div className="ep-label">Enter statements:</div>
-                <textarea
-                    ref={editorRef}
-                    className="sql-editor"
-                    spellCheck="false"
-                    placeholder="-- Type SQL here. Press Ctrl+Enter to execute.&#10;-- Oracle syntax supported (translated to SQLite automatically)&#10;-- Example: CREATE TABLE student (s_id NUMBER(4) PRIMARY KEY, name VARCHAR(20));"
+                <Editor
                     value={activeTab?.sql || ''}
-                    onChange={(e) => updateTabSql(activeTab.id, e.target.value)}
+                    onValueChange={(code) => updateTabSql(activeTab.id, code)}
+                    highlight={(code) => Prism.languages.sql ? Prism.highlight(code || '', Prism.languages.sql, 'sql') : code || ''}
+                    padding={12}
+                    className="sql-editor"
+                    textareaClassName="sql-editor-textarea"
+                    placeholder="-- Type SQL here. Press Ctrl+Enter to execute.&#10;-- Oracle syntax supported (translated to SQLite automatically)&#10;-- Example: CREATE TABLE student (s_id NUMBER(4) PRIMARY KEY, name VARCHAR(20));"
                     onKeyDown={handleKeyDown}
+                    insertSpaces={true}
+                    tabSize={4}
+                    style={{
+                        fontFamily: 'var(--mono)',
+                        fontSize: 13,
+                        lineHeight: 1.55,
+                        backgroundColor: 'var(--bg-panel)'
+                    }}
                 />
                 <div className="ep-footer">
                     <div className="ep-left">

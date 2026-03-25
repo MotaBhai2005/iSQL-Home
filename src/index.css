@@ -486,20 +486,34 @@ header {
 
 .sql-editor {
   width: 100%;
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 1.55;
-  padding: 9px 12px;
   border: 1px solid var(--border);
-  background: var(--bg-panel);
   resize: vertical;
-  min-height: 100px;
-  max-height: 240px;
-  outline: none;
+  min-height: 80px;
+  max-height: 50vh;
   color: var(--text);
-  tab-size: 4;
   border-radius: 2px;
+  overflow-y: auto;
 }
+
+.sql-editor-textarea {
+  outline: none !important;
+}
+
+/* Prism Syntax Highlighting */
+.token.keyword { color: #d73a49; font-weight: bold; }
+.token.string { color: #032f62; }
+.token.number { color: #005cc5; }
+.token.function { color: #6f42c1; }
+.token.operator { color: var(--oracle-blue2); }
+.token.punctuation { color: var(--text-muted); }
+.token.comment { color: #6a737d; font-style: italic; }
+.token.boolean { color: #005cc5; }
+
+[data-theme='dark'] .token.keyword, [data-theme='dimmed'] .token.keyword { color: #ff7b72; font-weight: bold; }
+[data-theme='dark'] .token.string, [data-theme='dimmed'] .token.string { color: #a5d6ff; }
+[data-theme='dark'] .token.number, [data-theme='dimmed'] .token.number { color: #79c0ff; }
+[data-theme='dark'] .token.function, [data-theme='dimmed'] .token.function { color: #d2a8ff; }
+[data-theme='dark'] .token.comment, [data-theme='dimmed'] .token.comment { color: #8b949e; font-style: italic; }
 
 .sql-editor:focus {
   border-color: var(--oracle-lightblue);
