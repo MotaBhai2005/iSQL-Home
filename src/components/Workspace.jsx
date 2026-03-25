@@ -8,6 +8,13 @@ const Workspace = React.forwardRef(({
     const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0];
     const editorRef = useRef(null);
 
+    React.useEffect(() => {
+        if (editorRef.current) {
+            editorRef.current.style.height = 'auto';
+            editorRef.current.style.height = editorRef.current.scrollHeight + 'px';
+        }
+    }, [activeTab?.sql]);
+
     const handleKeyDown = (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             e.preventDefault();

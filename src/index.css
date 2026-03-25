@@ -1334,6 +1334,8 @@ header {
   .sql-editor {
     font-size: 12px;
     min-height: 80px;
+    max-height: 50vh;
+    overflow-y: auto;
   }
 
   .snip-bar {
