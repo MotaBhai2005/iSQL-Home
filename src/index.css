@@ -863,7 +863,7 @@ header {
 .rp-tabs {
   display: flex;
   border-bottom: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--bg-sidebar);
 }
 
 .rp-tab {
@@ -932,12 +932,12 @@ header {
   word-break: break-all;
   color: var(--oracle-blue2);
   transition: background 0.1s;
-  border-left: 3px solid #D6EAF8;
+  border-left: 3px solid var(--oracle-lightblue);
 }
 
 .hist-item:hover {
-  background: rgba(46, 134, 193, 0.1);
-  border-left-color: var(--oracle-lightblue);
+  background: var(--bg-main);
+  border-left-color: var(--oracle-blue2);
 }
 
 /* Lab Questions */
@@ -984,7 +984,7 @@ header {
 }
 
 .lab-q {
-  background: white;
+  background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: 3px;
   margin-bottom: 7px;
@@ -992,11 +992,11 @@ header {
 }
 
 .lab-q-head {
-  background: #EBF0F1;
+  background: var(--bg-sidebar);
   padding: 5px 9px;
   font-size: 11px;
   font-weight: bold;
-  color: var(--oracle-blue);
+  color: var(--text);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -1004,7 +1004,7 @@ header {
 }
 
 .lab-q-head:hover {
-  background: #D6EAF8;
+  background: var(--bg-main);
 }
 
 .lab-q-body {
@@ -1026,19 +1026,19 @@ header {
 .lab-ans {
   font-family: var(--mono);
   font-size: 10px;
-  background: #F8F9FA;
-  border: 1px solid #E8EAEC;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
   padding: 6px 8px;
   border-radius: 2px;
   white-space: pre-wrap;
   word-break: break-all;
-  color: var(--oracle-blue);
+  color: var(--oracle-blue2);
   cursor: pointer;
   transition: background 0.1s;
 }
 
 .lab-ans:hover {
-  background: #D6EAF8;
+  background: var(--bg-main);
 }
 
 .lab-ans-hint {
@@ -1087,7 +1087,7 @@ header {
 .syn-title {
   font-size: 11px;
   font-weight: bold;
-  color: var(--oracle-blue);
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.4px;
   border-bottom: 1px solid var(--border);
@@ -1098,10 +1098,10 @@ header {
 .syn-block {
   font-family: var(--mono);
   font-size: 10px;
-  background: #F4F6F7;
+  background: var(--bg-sidebar);
   padding: 5px 8px;
   border-radius: 2px;
-  border-left: 3px solid #D6EAF8;
+  border-left: 3px solid var(--oracle-lightblue);
   white-space: pre-wrap;
   cursor: pointer;
   color: var(--oracle-blue2);
@@ -1110,12 +1110,13 @@ header {
 }
 
 .syn-block:hover {
-  background: #D6EAF8;
+  background: var(--bg-main);
+  border-left-color: var(--oracle-blue2);
 }
 
 .syn-note {
   font-size: 10px;
-  color: #aaa;
+  color: var(--text-muted);
   margin-bottom: 4px;
   font-style: italic;
 }
