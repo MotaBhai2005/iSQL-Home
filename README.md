@@ -1,58 +1,59 @@
 # 🗄️ iSQL*Home — College Practice Edition
 
-**iSQL*Home** is a browser-based Oracle SQL practice environment built for college students using React and WebAssembly. It runs a full SQLite engine natively in the browser — no backend, no installation — while transparently emulating Oracle-specific syntax like `SYSDATE`, `VARCHAR2`, and 15+ Oracle-native functions. 
+**iSQL*Home (QPracto)** is an advanced, browser-based Oracle SQL practice environment designed for college students. It runs a lightning-fast SQLite engine natively inside your browser via WebAssembly — requiring absolutely no backend installation — while transparently emulating complex Oracle specific syntax like `SYSDATE`, `VARCHAR2`, and native single-row functions.
 
-The app features a multi-tab SQL workspace, a live schema browser, built-in lab question sets covering DDL/DML, single-row functions, subqueries, and joins, along with a syntax reference guide and query history panel. 
+Complete with a dynamic, VS-Code like typing experience, a live schema tree, and a built-in Lab Assessment tracker, this tool is the ultimate isolated sandbox for mastering database management.
 
 ---
 
-## ✨ Features
+## ✨ Core Features
 
-- **Oracle SQL Emulation**: Runs SQLite under the hood but automatically translates Oracle syntax:
-  - `SYSDATE` → returns `DD-MON-YYYY` format.
-  - `RIGHT JOIN` → rewritten automatically as `LEFT JOIN`.
-  - `FULL OUTER JOIN` → rewritten automatically using `UNION ALL`.
-- **15+ Native Oracle Functions**: Transparently polyfilled directly into the SQLite WASM engine (`INITCAP`, `LPAD`, `RPAD`, `MONTHS_BETWEEN`, `NEXT_DAY`, `LAST_DAY`, `TRUNC`, `TO_CHAR`, `TO_DATE`, `TO_NUMBER`, `NVL`, `ADD_MONTHS`).
-- **Strict Typing (`ORA-01722`)**: Relies on dynamic generation of `BEFORE INSERT` and `BEFORE UPDATE` database triggers to force strict data typing, halting bad inputs gracefully like a real Oracle server.
-- **Zero-Freeze Background Execution**: The entire database engine computes queries on an asynchronous **Web Worker**, ensuring the frontend UI never locks up during massive analytical `CROSS JOIN` calculations.
-- **Limitless Offline Persistence**: Replaces normal 5MB LocalStorage with **IndexedDB** (`localforage`), permanently saving massive binary database arrays natively in your browser.
-- **Fully Responsive**: Drag-to-resize split panels on Desktop, and a dedicated tabbed navigation layout for Mobile.
+- **Rich Syntax Highlighting**: Includes a beautifully integrated `react-simple-code-editor` powered by `Prism.js` for instant, colorful SQL code highlighting and an auto-expanding notepad that seamlessly scales as you type.
+- **Smart Schema Browser**: A visual left-panel explorer that dynamically detects and badges Primary Keys (**PK**), Not Null constraints (**NN**), and sophisticated Foreign Key (**FK**) relationships linking straight to their parent tables.
+- **Assessment Tracking System**: Togglable "Exam Mode" for the built-in Lab Q&A! Unlocks physical checkboxes and a visual progress bar that securely saves your completed assignments across page refreshes via `localStorage`.
+- **Client-Side CSV Export**: Click a single button underneath any successfully returning `SELECT` query to instantly parse your data matrix into a downloadable `.csv` file using local Blob construction!
+- **Zero-Crash Pagination Engine**: Easily handles massive 10,000+ row datasets. React neatly parses returning JSON payloads into chunked pages (50 rows/page) with intuitive `[< Prev]` and `[Next >]` controllers to keep the browser fast.
+- **3-Way Dynamic Themes**: Built-in support for fluid layouts including Light Mode, GitHub Dark Mode, and a specialized GitHub Dimmed Mode.
+- **Live System Timers**: A real-time ticking `setInterval` digital clock and breathing visual pulse animations on the active database connection to give the interface a real "Server IDE" dashboard feel.
+- **Oracle SQL Emulation**: 
+  - `SYSDATE` → Returns standardized string formats natively.
+  - `RIGHT JOIN` / `FULL OUTER JOIN` → Rewritten dynamically using `LEFT JOIN` and `UNION ALL` fallbacks.
+  - Generates structural `BEFORE UPDATE` constraints enforcing strict native Oracle error codes like `ORA-01722: invalid number`.
 
 ---
 
 ## 🔧 Tech Stack
 
-- **Framework**: React 18 & Vite (Lightning-fast HMR and modular bundling)
+- **Framework**: React 18 & Vite (Lightning-fast HMR and modular UI bundling)
 - **Database Engine**: `sql.js` (The official SQLite port, compiled explicitly to C-based WebAssembly)
-- **Storage Layer**: `localforage` (Wrapper for native IndexedDB binary storage)
-- **Styling**: Vanilla CSS Variables (For instant Light/Dark mode toggling)
-- **Layout Management**: `react-split` for Draggable Desktop panes
-- **Distribution via Cloudflare CDN**: Employs `cdnjs` servers to distribute the heavy `sql-wasm.wasm` binary file globally. Instead of capping bandwidth limits, the client leverages Cloudflare's edge servers for instant database loading during initialization!
+- **Editor UI**: `react-simple-code-editor` + `Prism.js`
+- **Storage Layer**: `localforage` (Wrapper for native IndexedDB binary persistence) + `localStorage` (Theme / Cache)
+- **Layout Management**: `react-split` (Handling drag-to-resize viewport scaling and 100dvh mobile compliance)
+- **Distribution via Cloudflare CDN**: Employs `cdnjs` endpoints to distribute the demanding `sql-wasm.wasm` binary file globally off the edge grid for instantaneous execution times.
 
 ---
 
 ## 🚀 Getting Started
 
-Since the database runs entirely via WebAssembly in the browser, there is zero backend setup required!
+Since the database runs entirely via WebAssembly inside a Web Worker, there is absolutely zero backend node configuration or Docker setup required!
 
 ### Prerequisites
 - Node.js installed
 
 ### Installation
 
-1. Clone the repository
-2. Navigate to the project directory:
+1. Clone the repository and navigate inside:
    ```bash
    cd iSQL-Home
    ```
-3. Install dependencies:
+2. Install the necessary UI dependencies:
    ```bash
    npm install
    ```
-4. Start the development server (Vite):
+3. Start the lightning-fast Vite development server:
    ```bash
    npm run dev
    ```
 
 ### 🌍 Deployment
-Deploying to GitHub Pages is fully automated! Push your code to the `main` branch, and the engineered `.github/workflows/deploy.yml` GitHub Action will automatically configure Node.js 24 environment variables and build the persistent Vite payload directly to the public web.
+Deploying to GitHub Pages is fully automated! Push your code to the `main` branch, and the engineered `.github/workflows/deploy.yml` GitHub Action will configure the deployment variables and build the persistent Vite payload directly to the public web.
