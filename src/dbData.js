@@ -392,6 +392,31 @@ export const LAB_DATA = {
                 a: `SELECT e.first_name, e.last_name, e.hire_date, d.department_name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.department_id\nWHERE e.hire_date > '01-JAN-2020';`
             }
         ]
+    },
+    setops: {
+        note: 'From Set Operations — UNION, UNION ALL, INTERSECT, MINUS/EXCEPT.',
+        questions: [
+            {
+                q: 'Setup: Create tables Customer and Orders with a single column customer_id and insert overlapping data.',
+                a: `CREATE TABLE Customer (customer_id NUMBER);\nCREATE TABLE Orders (customer_id NUMBER);\nINSERT INTO Customer VALUES (1), (2), (3);\nINSERT INTO Orders VALUES (2), (3), (4);`
+            },
+            {
+                q: 'UNION: Get a unique list of all customer IDs from both the Customer and Orders tables.',
+                a: `SELECT customer_id FROM Customer\nUNION\nSELECT customer_id FROM Orders;`
+            },
+            {
+                q: 'UNION ALL: Combine all customer IDs from both tables seamlessly, retaining all duplicates.',
+                a: `SELECT customer_id FROM Customer\nUNION ALL\nSELECT customer_id FROM Orders;`
+            },
+            {
+                q: 'INTERSECT: Find only the registered customers who have successfully placed an order.',
+                a: `SELECT customer_id FROM Customer\nINTERSECT\nSELECT customer_id FROM Orders;`
+            },
+            {
+                q: 'EXCEPT (MINUS): Find registered customers who have NOT placed any orders.',
+                a: `SELECT customer_id FROM Customer\nEXCEPT\nSELECT customer_id FROM Orders;\n-- Note: In Oracle this operator is called MINUS, but SQLite uses the ANSI standard EXCEPT.`
+            }
+        ]
     }
 };
 

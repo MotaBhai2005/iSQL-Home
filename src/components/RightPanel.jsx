@@ -69,6 +69,7 @@ const RightPanel = React.forwardRef(({ queryHistory, onSelectSql, ...props }, re
                         <option value="sql1">SQL-1: Basics (DDL/DML)</option>
                         <option value="sql2">SQL-2: SELECT, Operators, Aliases</option>
                         <option value="sql3">SQL-3: Functions &amp; GROUP BY</option>
+                        <option value="setops">Set Operations (UNION, INTERSECT)</option>
                         <option value="subquery">Subqueries &amp; ORDER BY</option>
                         <option value="constraints">Constraints</option>
                         <option value="joins">Joins</option>
