@@ -155,24 +155,26 @@ const Workspace = React.forwardRef(({
             {/* Editor Panel */}
             <div className="editor-panel">
                 <div className="ep-label">Enter statements:</div>
-                <Editor
-                    value={activeTab?.sql || ''}
-                    onValueChange={(code) => updateTabSql(activeTab.id, code)}
-                    highlight={(code) => Prism.languages.sql ? Prism.highlight(code || '', Prism.languages.sql, 'sql') : code || ''}
-                    padding={12}
-                    className="sql-editor"
-                    textareaClassName="sql-editor-textarea"
-                    placeholder="-- Type SQL here. Press Ctrl+Enter to execute.&#10;-- Oracle syntax supported (translated to SQLite automatically)&#10;-- Example: CREATE TABLE student (s_id NUMBER(4) PRIMARY KEY, name VARCHAR(20));"
-                    onKeyDown={handleKeyDown}
-                    insertSpaces={true}
-                    tabSize={4}
-                    style={{
-                        fontFamily: 'var(--mono)',
-                        fontSize: 13,
-                        lineHeight: 1.55,
-                        backgroundColor: 'var(--bg-panel)'
-                    }}
-                />
+                <div className="sql-editor-wrapper">
+                    <Editor
+                        value={activeTab?.sql || ''}
+                        onValueChange={(code) => updateTabSql(activeTab.id, code)}
+                        highlight={(code) => Prism.languages.sql ? Prism.highlight(code || '', Prism.languages.sql, 'sql') : code || ''}
+                        padding={12}
+                        className="sql-editor"
+                        textareaClassName="sql-editor-textarea"
+                        placeholder="-- Type SQL here. Press Ctrl+Enter to execute.&#10;-- Oracle syntax supported (translated to SQLite automatically)&#10;-- Example: CREATE TABLE student (s_id NUMBER(4) PRIMARY KEY, name VARCHAR(20));"
+                        onKeyDown={handleKeyDown}
+                        insertSpaces={true}
+                        tabSize={4}
+                        style={{
+                            fontFamily: 'var(--mono)',
+                            fontSize: 13,
+                            lineHeight: 1.55,
+                            backgroundColor: 'var(--bg-panel)'
+                        }}
+                    />
+                </div>
                 <div className="ep-footer">
                     <div className="ep-left">
                         <button className="exec-btn" onClick={() => onRunSQL(activeTab.sql)}>Execute</button>

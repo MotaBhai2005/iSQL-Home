@@ -539,15 +539,19 @@ header {
   letter-spacing: 0.3px;
 }
 
-.sql-editor {
-  width: 100%;
+.sql-editor-wrapper {
   border: 1px solid var(--border);
   resize: vertical;
   min-height: 80px;
   max-height: 50vh;
-  color: var(--text);
-  border-radius: 2px;
   overflow-y: auto;
+  border-radius: 2px;
+}
+
+.sql-editor {
+  width: 100%;
+  min-height: 100%;
+  color: var(--text);
 }
 
 .sql-editor-textarea {
@@ -570,7 +574,7 @@ header {
 [data-theme='dark'] .token.function, [data-theme='dimmed'] .token.function { color: #d2a8ff; }
 [data-theme='dark'] .token.comment, [data-theme='dimmed'] .token.comment { color: #8b949e; font-style: italic; }
 
-.sql-editor:focus {
+.sql-editor-wrapper:focus-within {
   border-color: var(--oracle-lightblue);
   box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.12);
 }
@@ -1350,11 +1354,14 @@ header {
     /* hide Ctrl+Enter hint and char count on very small screens */
   }
 
-  .sql-editor {
-    font-size: 12px;
+  .sql-editor-wrapper {
     min-height: 80px;
     max-height: 50vh;
     overflow-y: auto;
+  }
+
+  .sql-editor {
+    font-size: 12px;
   }
 
   .snip-bar {
