@@ -74,6 +74,13 @@ const RightPanel = React.forwardRef(({ queryHistory, onSelectSql, ...props }, re
                         <option value="constraints">Constraints</option>
                         <option value="joins">Joins</option>
                     </select>
+                    <button className="clear-btn" onClick={() => {
+                        const allRevealed = {};
+                        catData.questions.forEach((_, idx) => allRevealed[idx] = true);
+                        setRevealedAnswers(allRevealed);
+                    }} style={{ padding: '4px 6px' }}>
+                        👁 Show All Answers
+                    </button>
                     <button className="clear-btn" onClick={handleToggleAssess} style={{ padding: '4px 6px', background: assessmentMode ? 'var(--oracle-blue)' : 'white', color: assessmentMode ? 'white' : 'var(--text)' }}>
                         {assessmentMode ? '✓ Assessment ON' : 'Assessment'}
                     </button>
