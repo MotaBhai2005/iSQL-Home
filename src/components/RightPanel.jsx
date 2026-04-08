@@ -6,6 +6,7 @@ const RightPanel = React.forwardRef(({ queryHistory, onSelectSql, ...props }, re
     const [activeTab, setActiveTab] = useState('lab');
     const [labCategory, setLabCategory] = useState('sql1');
     const [openLabQ, setOpenLabQ] = useState(null);
+    const [globalShowAnswers, setGlobalShowAnswers] = useState(false);
     // To track which questions have answers revealed
     const [revealedAnswers, setRevealedAnswers] = useState({});
     
@@ -74,12 +75,8 @@ const RightPanel = React.forwardRef(({ queryHistory, onSelectSql, ...props }, re
                         <option value="constraints">Constraints</option>
                         <option value="joins">Joins</option>
                     </select>
-                    <button className="clear-btn" onClick={() => {
-                        const allRevealed = {};
-                        catData.questions.forEach((_, idx) => allRevealed[idx] = true);
-                        setRevealedAnswers(allRevealed);
-                    }} style={{ padding: '4px 6px' }}>
-                        👁 Show All Answers
+                    <button className="clear-btn" onClick={() => setGlobalShowAnswers(prev => !prev)} style={{ padding: '4px 6px' }}>
+                        {globalShowAnswers ? '👁 Hide Answers' : '👁 Show All Answers'}
                     </button>
                     <button className="clear-btn" onClick={handleToggleAssess} style={{ padding: '4px 6px', background: assessmentMode ? 'var(--oracle-blue)' : 'white', color: assessmentMode ? 'white' : 'var(--text)' }}>
                         {assessmentMode ? '✓ Assessment ON' : 'Assessment'}
@@ -102,13 +99,13 @@ const RightPanel = React.forwardRef(({ queryHistory, onSelectSql, ...props }, re
 
                 <div className="lab-q-list">
                     {catData ? catData.questions.map((item, i) => {
-                        const isOpen = openLabQ === i;
-                        const isRevealed = !!revealedAnswers[i];
+                        const isOpen = globalShowAnswers || openLabQ === i;
+                        const isRevealed = globalShowAnswers || !!revealedAnswers[i];
                         const isDone = catProgress.includes(i);
                         return (
                             <div key={i} className={`lab-q ${isOpen ? 'open' : ''}`} style={{ opacity: isDone ? 0.6 : 1 }}>
                                 <div className="lab-q-head" onClick={() => {
-                                    if (isOpen) {
+                                    if (openLabQ === i) {
                                         setOpenLabQ(null);
                                         setRevealedAnswers(prev => {
                                             const next = { ...prev };
@@ -137,7 +134,7 @@ const RightPanel = React.forwardRef(({ queryHistory, onSelectSql, ...props }, re
                                 </div>
                                 <div className="lab-q-body">
                                     <div className="lab-q-text">{item.q}</div>
-                                    {revealedAnswers[i] ? (
+                                    {isRevealed ? (
                                         <>
                                             <div className="lab-ans" title="Click to load into editor" onClick={() => onSelectSql(item.a)}>
                                                 {item.a}
